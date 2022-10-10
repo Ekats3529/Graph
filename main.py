@@ -2,19 +2,19 @@ import graph
 from graph import Graph
 
 commands = {"CREATE EMPTY": "Create a new empty graph",
-            "CREATE FROM FILE": "Create a new graph from the file",
-            "CREATE A COPY": "Create the copy of existing graph",
+            "CREATE FILE": "Create a new graph from the file",
+            "CREATE COPY": "Create the copy of existing graph",
             "ADD VERTEX": "Add a vertex to the graph",
             "ADD EDGE": "Add an edge to the graph",
             "DELETE VERTEX": "Remove a vertex from the graph",
             "DELETE EDGE": "Remove an edge from the graph",
-            "PRINT LIST OF EDGES FILE": "Print list of edges to the file",
-            "PRINT LIST OF EDGES CONSOLE": "Print list of edges to the console(there)",
-            "PRINT ADJACENCY LIST TO CONSOLE": "Print adjacency list to the console(there)",
+            "PRINT LIST EDGES FILE": "Print list of edges to the file",
+            "PRINT LIST EDGES CONSOLE": "Print list of edges to the console(there)",
+            "PRINT ADJACENCY LIST CONSOLE": "Print adjacency list to the console(there)",
             "HELP": "Print the hint for the command",
             "EXIT": "Exit the execution",
-            "PRINT LIST OF COMMANDS": "Print list of commands to the console(there)",
-            "PRINT LIST OF GRAPHS": "Print list of graphs to the console(there)"}
+            "PRINT LIST COMMANDS": "Print list of commands to the console(there)",
+            "PRINT LIST GRAPHS": "Print list of graphs to the console(there)"}
 
 graphs = {}
 
@@ -85,12 +85,12 @@ if __name__ == '__main__':
                 create()
                 pass
 
-            elif command == "CREATE FROM FILE":
+            elif command == "CREATE FILE":
                 print("Enter the name of file")
                 create(input())
                 pass
 
-            elif command == "CREATE A COPY":
+            elif command == "CREATE COPY":
                 pass
 
             elif command == "ADD VERTEX":
@@ -117,24 +117,24 @@ if __name__ == '__main__':
                 edge = input().split()
                 cur_graph.delete_edge(edge)
 
-            elif command == "PRINT LIST OF EDGES FILE":
+            elif command == "PRINT LIST EDGES FILE":
                 cur_graph = get_graph_by_name()
                 print("Enter the name of file")
                 filename = input()
                 cur_graph.print_to_file(filename)
 
-            elif command == "PRINT LIST OF EDGES CONSOLE":
+            elif command == "PRINT LIST EDGES CONSOLE":
                 cur_graph = get_graph_by_name()
                 print(cur_graph.create_edge_list())
 
-            elif command == "PRINT ADJACENCY LIST TO CONSOLE":
+            elif command == "PRINT ADJACENCY LIST CONSOLE":
                 cur_graph = get_graph_by_name()
                 cur_graph.print_to_console()
 
-            elif command == "PRINT LIST OF COMMANDS":
+            elif command == "PRINT LIST COMMANDS":
                 print_menu()
 
-            elif command == "PRINT LIST OF GRAPHS":
+            elif command == "PRINT LIST GRAPHS":
                 for gr in graphs.items():
                     print(f"Name: {gr[0]}\tAdjacency list: ", end="")
                     gr[1].print_to_console()
