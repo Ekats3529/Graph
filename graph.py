@@ -23,26 +23,38 @@ class Graph:
             print("ERROR: No such file or directory")
             return False
 
-        type = fin.readline()
+        self.type = fin.readline().split()[0]
         n, m = map(int, fin.readline().split())
         self.nodes_list = fin.readline().split()
+
+        for node in self.nodes_list:
+                adj_list[node] = []
+
         edges = fin.readlines()
 
         for edge in edges:
             v, u = edge.split()
+            try:
+                if u in self.nodes_list:
+                    adj_list[v].append(u)
+                else:
+                    print(f"ERROR: No such vertex {u}")
+                    return False
+            except KeyError:
+                print(f"ERROR: No such vertex {v}")
+                return False
 
-            if v not in adj_list.keys():
-                adj_list[v] = []
-            adj_list[v].append(u)
+            if self.type == "!directed":
+                try:
+                    if v in self.nodes_list:
+                        adj_list[u].append(v)
+                    else:
+                        print(f"ERROR: No such vertex {v}")
+                        return False
+                except KeyError:
+                    print(f"ERROR: No such vertex {u}")
+                    return False
 
-            if type != "directed":
-                if u not in adj_list.keys():
-                    adj_list[u] = []
-                adj_list[u].append(v)
-        if len(adj_list.keys()) != n:
-            for node in self.nodes_list:
-                if node not in adj_list.keys():
-                    adj_list[node] = []
         self.adj_list = adj_list
         return True
 
@@ -61,7 +73,7 @@ class Graph:
             print(f"Unable to add the edge. No such vertex {v}")
             return False
 
-        if type != "directed":
+        if self.type != "directed":
             try:
                 self.adj_list[u].append(v)
             except KeyError:
@@ -86,14 +98,14 @@ class Graph:
 
         try:
             del self.adj_list[v][(self.adj_list[v]).index(u)]
-        except KeyError:
+        except (KeyError, ValueError):
             print(f"ERROR: No such edge ({v}, {u})")
             return False
 
-        if type != "directed":
+        if self.type != "directed":
             try:
                 del self.adj_list[u][(self.adj_list[u]).index(v)]
-            except KeyError:
+            except (KeyError, ValueError):
                 print(f"ERROR: No such edge ({v}, {u})")
                 return False
         return True
@@ -107,11 +119,10 @@ class Graph:
         lst = self.create_edge_list()
         print(self.type, file=fout)
         print(len(self.nodes_list), len(lst), file=fout)
+        print(" ".join(self.nodes_list), file=fout)
         for edge in lst:
             print(f"{edge[0]} {edge[1]}", file=fout)
         return True
 
     def print_to_console(self):
         print(self.adj_list)
-
-
