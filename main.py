@@ -1,9 +1,15 @@
 import graph
 from graph import Graph
 
+commands_num = {"1": "CREATE EMPTY", "2": "CREATE FILE", "3": "COPY", "4": "CHOOSE GRAPH",
+                "5": "ADD VERTEX", "6": "ADD EDGE", "7": "DELETE VERTEX", "8": "DELETE EDGE",
+                "9": "PRINT LIST EDGES FILE", "10": "PRINT LIST EDGES CONSOLE", "11": "PRINT ADJACENCY LIST CONSOLE",
+                "13": "HELP", "14": "PRINT LIST COMMANDS", "15": "PRINT LIST GRAPHS", "0": "EXIT", "100": "IN DEG"}
+
 commands = {"CREATE EMPTY": "Create a new empty graph",
             "CREATE FILE": "Create a new graph from the file",
-            "CREATE COPY": "Create the copy of existing graph",
+            "COPY": "Create the copy of existing graph",
+            "CHOOSE GRAPH": "Choose the name if graph to work with",
             "ADD VERTEX": "Add a vertex to the graph",
             "ADD EDGE": "Add an edge to the graph",
             "DELETE VERTEX": "Remove a vertex from the graph",
@@ -14,15 +20,17 @@ commands = {"CREATE EMPTY": "Create a new empty graph",
             "HELP": "Print the hint for the command",
             "EXIT": "Exit the execution",
             "PRINT LIST COMMANDS": "Print list of commands to the console(there)",
-            "PRINT LIST GRAPHS": "Print list of graphs to the console(there)"}
+            "PRINT LIST GRAPHS": "Print list of graphs to the console(there)",
+            "IN DEG": "-"}
 
 graphs = {}
+chosen_graph = None
 
 
 def print_menu():
     print("Enter the command from the list")
-    for value in commands.keys():
-        print(value)
+    for items in commands_num.items():
+        print(items[0], items[1])
 
 
 def create(*filename):
@@ -40,28 +48,52 @@ def create(*filename):
             graphs[name] = gr
 
 
-def get_graph_by_name():
-    print("Enter the name of graph")
-    name = input()
-    while name not in graphs.keys():
-        print("ERROR: NO SUCH GRAPH. Enter name again")
+def get_graph_by_name(name):
+    if name is None:
+        print("Enter the name of graph or enter STOP to stop entering")
         name = input()
+        if name in graphs.keys():
+            chosen_graph = name
+            return graphs[chosen_graph]
+        else:
+            while name not in graphs.keys():
+                print("ERROR. Try to enter another name or STOP to stop entering")
+                name = input()
+                if name == "STOP":
+                    chosen_graph = None
+                    return None
+            else:
+                chosen_graph = name
+                return graphs[chosen_graph]
     return graphs[name]
+
+
+def in_deg(graph, node):
+    if node not in graph.nodes_list:
+        print(f"No such vertex {node}")
+        return -1
+    ans = 0
+    for item in graph.adj_list.items():
+        nodes = [x[0] for x in item[1]]
+        if node in nodes:
+            ans += 1
+    return ans
 
 
 if __name__ == '__main__':
     print_menu()
     print("\nENTER THE COMMAND: ", end="")
     command = input()
-    while command != "EXIT":
-        if command not in commands.keys():
+    cur_graph = None
+    while command != "EXIT" and command != "0":
+        if command not in commands.keys() and command not in commands_num.keys():
             print("ERROR: UNKNOWN COMMAND")
 
         else:
-            if command == "EXIT":
+            if command == "EXIT" or command == "0":
                 exit(0)
 
-            elif command == "HELP":
+            elif command == "HELP" or command == "13":
                 fl = False
                 print("To exit HELP enter STOP")
                 print("Enter the name of command")
@@ -81,63 +113,89 @@ if __name__ == '__main__':
                     print("Enter the name of command")
                     name = input()
 
-            elif command == "CREATE EMPTY":
+            elif command == "CREATE EMPTY" or command == "1":
                 create()
                 pass
 
-            elif command == "CREATE FILE":
+            elif command == "CHOOSE GRAPH" or command == "4":
+                cur_graph = get_graph_by_name(None)
+
+            elif command == "CREATE FILE" or command == "2":
                 print("Enter the name of file")
                 create(input())
                 pass
 
-            elif command == "CREATE COPY":
+            elif command == "COPY" or command == "3":
                 pass
 
-            elif command == "ADD VERTEX":
-                cur_graph = get_graph_by_name()
-                print("Enter the vertex to add: ", end="")
-                node = input()
-                cur_graph.add_node(node)
+            elif command == "ADD VERTEX" or command == "5":
+                if cur_graph is None:
+                    cur_graph = get_graph_by_name(None)
+                if cur_graph is not None:
+                    print("Enter the vertex to add: ", end="")
+                    node = input()
+                    cur_graph.add_node(node)
 
-            elif command == "ADD EDGE":
-                cur_graph = get_graph_by_name()
-                print("Enter the edge to add in format "'begin end'": ", end="")
-                edge = input().split()
-                cur_graph.add_edge(edge)
+            elif command == "ADD EDGE" or command == "6":
+                if cur_graph is None:
+                    cur_graph = get_graph_by_name(None)
+                if cur_graph is not None:
+                    print("Enter the edge to add in format "'begin end'": ", end="")
+                    edge = input().split()
+                    cur_graph.add_edge(edge)
 
-            elif command == "DELETE VERTEX":
-                cur_graph = get_graph_by_name()
-                print("Enter the vertex to delete: ", end="")
-                node = input()
-                cur_graph.delete_node(node)
+            elif command == "DELETE VERTEX" or command == "7":
+                if cur_graph is None:
+                    cur_graph = get_graph_by_name(None)
+                if cur_graph is not None:
+                    print("Enter the vertex to delete: ", end="")
+                    node = input()
+                    cur_graph.delete_node(node)
 
-            elif command == "DELETE EDGE":
-                cur_graph = get_graph_by_name()
-                print('Enter the edge to delete in format "begin end":', end="")
-                edge = input().split()
-                cur_graph.delete_edge(edge)
+            elif command == "DELETE EDGE" or command == "8":
+                if cur_graph is None:
+                    cur_graph = get_graph_by_name(None)
+                if cur_graph is not None:
+                    print('Enter the edge to delete in format "begin end":', end="")
+                    edge = input().split()
+                    cur_graph.delete_edge(edge)
 
-            elif command == "PRINT LIST EDGES FILE":
-                cur_graph = get_graph_by_name()
-                print("Enter the name of file")
-                filename = input()
-                cur_graph.print_to_file(filename)
+            elif command == "PRINT LIST EDGES FILE" or command == "9":
+                if cur_graph is None:
+                    cur_graph = get_graph_by_name(None)
+                if cur_graph is not None:
+                    print("Enter the name of file")
+                    filename = input()
+                    cur_graph.print_to_file(filename)
 
-            elif command == "PRINT LIST EDGES CONSOLE":
-                cur_graph = get_graph_by_name()
-                print(cur_graph.create_edge_list())
+            elif command == "PRINT LIST EDGES CONSOLE" or command == "10":
+                if cur_graph is None:
+                    cur_graph = get_graph_by_name(None)
+                if cur_graph is not None:
+                    print(cur_graph.create_edge_list())
 
-            elif command == "PRINT ADJACENCY LIST CONSOLE":
-                cur_graph = get_graph_by_name()
-                cur_graph.print_to_console()
+            elif command == "PRINT ADJACENCY LIST CONSOLE" or command == "11":
+                if cur_graph is None:
+                    cur_graph = get_graph_by_name(None)
+                if cur_graph is not None:
+                    cur_graph.print_to_console()
 
-            elif command == "PRINT LIST COMMANDS":
+            elif command == "PRINT LIST COMMANDS" or command == "14":
                 print_menu()
 
-            elif command == "PRINT LIST GRAPHS":
+            elif command == "PRINT LIST GRAPHS" or command == "15":
                 for gr in graphs.items():
                     print(f"Name: {gr[0]}\tAdjacency list: ", end="")
                     gr[1].print_to_console()
+
+            elif command == "IN DEG" or command == "100":
+                if cur_graph is None:
+                    cur_graph = get_graph_by_name(None)
+                if cur_graph is not None:
+                    print("Enter the node")
+                    node = input()
+                    print(in_deg(cur_graph, node))
+
 
         print("\nENTER THE COMMAND: ", end="")
         command = input()
