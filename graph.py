@@ -4,8 +4,10 @@ class Graph:
     weighted = False
     nodes_list = []
 
-    def __init__(self):
+    def __init__(self, type, weighted):
         self.adj_list = {}
+        self.type = type
+        self.weighted = weighted
 
     def create_edge_list(self):
         edge_list = []
@@ -181,4 +183,15 @@ class Graph:
         return True
 
     def print_to_console(self):
-        print(self.adj_list)
+        print()
+        if self.weighted:
+            for item in self.adj_list.items():
+                nodes = ["(" + ",".join([x[0], x[1]]) + ")" for x in item[1]]
+                line = " ".join(nodes)
+                print(f"{item[0]}: {line}")
+        else:
+            for item in self.adj_list.items():
+                nodes = [x[0] for x in item[1]]
+                line = " ".join(nodes)
+                print(f"{item[0]}: {line}")
+
