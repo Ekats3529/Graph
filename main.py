@@ -34,10 +34,23 @@ def print_menu():
 
 
 def create(*filename):
-    gr = Graph()
     fl = True
     if len(filename) == 1:
+        gr = Graph()
         fl = gr.create_from_file(filename[0])
+    else:
+        print("Enter the type of graph: directed or !directed")
+        type = input()
+        if type != "directed" or type != "!directed":
+            print("ERROR: Unexpected type")
+            return
+        print("Enter the type of graph: weighted or !weighted")
+        weight = input()
+        if type != "weighted" or type != "!weighted":
+            print("ERROR: Unexpected type")
+            return
+        gr = Graph(type, weight)
+
     if fl:
         print("Enter the name for the new graph")
         name = input()
@@ -45,6 +58,7 @@ def create(*filename):
             print("This name already exists. Enter another")
             name = input()
         else:
+            chosen_graph = name
             graphs[name] = gr
 
 
@@ -73,11 +87,13 @@ def in_deg(graph, node):
         print(f"No such vertex {node}")
         return -1
     ans = 0
+    neib = []
     for item in graph.adj_list.items():
         nodes = [x[0] for x in item[1]]
         if node in nodes:
+            neib.append(item[0])
             ans += 1
-    return ans
+    return ans, neib
 
 
 if __name__ == '__main__':
@@ -194,8 +210,9 @@ if __name__ == '__main__':
                 if cur_graph is not None:
                     print("Enter the node")
                     node = input()
-                    print(in_deg(cur_graph, node))
-
+                    ans = in_deg(cur_graph, node)
+                    if ans != -1:
+                        print(f"in degree {ans[0]}\nneighbours {ans[1]}")
 
         print("\nENTER THE COMMAND: ", end="")
         command = input()
