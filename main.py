@@ -1,10 +1,12 @@
 import graph
+import tasks
 from graph import Graph
 
 commands_num = {"1": "CREATE EMPTY", "2": "CREATE FILE", "3": "COPY", "4": "CHOOSE GRAPH",
                 "5": "ADD VERTEX", "6": "ADD EDGE", "7": "DELETE VERTEX", "8": "DELETE EDGE",
                 "9": "PRINT LIST EDGES FILE", "10": "PRINT LIST EDGES CONSOLE", "11": "PRINT ADJACENCY LIST CONSOLE",
-                "13": "HELP", "14": "PRINT LIST COMMANDS", "15": "PRINT LIST GRAPHS", "0": "EXIT", "100": "IN DEG"}
+                "13": "HELP", "14": "PRINT LIST COMMANDS", "15": "PRINT LIST GRAPHS", "0": "EXIT",
+                "100": "IN DEGREE", "101": "TASK Ib 18"}
 
 commands = {"CREATE EMPTY": "Create a new empty graph",
             "CREATE FILE": "Create a new graph from the file",
@@ -21,7 +23,9 @@ commands = {"CREATE EMPTY": "Create a new empty graph",
             "EXIT": "Exit the execution",
             "PRINT LIST COMMANDS": "Print list of commands to the console(there)",
             "PRINT LIST GRAPHS": "Print list of graphs to the console(there)",
-            "IN DEG": "-"}
+            "IN DEGREE": "-",
+            "TASK Ib 18": "-"
+            }
 
 graphs = {}
 chosen_graph = None
@@ -41,12 +45,12 @@ def create(*filename):
     else:
         print("Enter the type of graph: directed or !directed")
         type = input()
-        if type != "directed" or type != "!directed":
+        if type != "directed" and type != "!directed":
             print("ERROR: Unexpected type")
             return
         print("Enter the type of graph: weighted or !weighted")
         weight = input()
-        if type != "weighted" or type != "!weighted":
+        if weight != "weighted" and weight != "!weighted":
             print("ERROR: Unexpected type")
             return
         gr = Graph(type, weight)
@@ -58,42 +62,30 @@ def create(*filename):
             print("This name already exists. Enter another")
             name = input()
         else:
-            chosen_graph = name
             graphs[name] = gr
 
 
 def get_graph_by_name(name):
+    global chosen_graph
     if name is None:
         print("Enter the name of graph or enter STOP to stop entering")
-        name = input()
-        if name in graphs.keys():
-            chosen_graph = name
+        in_name = input()
+        if in_name in graphs.keys():
+            chosen_graph = in_name
             return graphs[chosen_graph]
         else:
-            while name not in graphs.keys():
+            while in_name not in graphs.keys():
                 print("ERROR. Try to enter another name or STOP to stop entering")
-                name = input()
-                if name == "STOP":
+                in_name = input()
+                if in_name == "STOP":
                     chosen_graph = None
                     return None
             else:
-                chosen_graph = name
+                chosen_graph = in_name
+
                 return graphs[chosen_graph]
+    chosen_graph = name
     return graphs[name]
-
-
-def in_deg(graph, node):
-    if node not in graph.nodes_list:
-        print(f"No such vertex {node}")
-        return -1
-    ans = 0
-    neib = []
-    for item in graph.adj_list.items():
-        nodes = [x[0] for x in item[1]]
-        if node in nodes:
-            neib.append(item[0])
-            ans += 1
-    return ans, neib
 
 
 if __name__ == '__main__':
@@ -131,7 +123,6 @@ if __name__ == '__main__':
 
             elif command == "CREATE EMPTY" or command == "1":
                 create()
-                pass
 
             elif command == "CHOOSE GRAPH" or command == "4":
                 cur_graph = get_graph_by_name(None)
@@ -139,15 +130,30 @@ if __name__ == '__main__':
             elif command == "CREATE FILE" or command == "2":
                 print("Enter the name of file")
                 create(input())
-                pass
 
             elif command == "COPY" or command == "3":
-                pass
+                if cur_graph is None:
+                    cur_graph = get_graph_by_name(None)
+                if cur_graph is not None:
+                    print(f"Current graph is: {chosen_graph}")
+                    print("Enter the name of the copy-graph: ", end="")
+                    name = input()
+                    if name not in graphs.keys():
+                        graphs[name] = cur_graph.copy()
+                    else:
+                        while name in graphs.keys():
+                            print("ERROR. Try to enter another name or STOP to stop entering")
+                            name = input()
+                            if name == "STOP":
+                                break
+                        else:
+                            graphs[name] = cur_graph.copy()
 
             elif command == "ADD VERTEX" or command == "5":
                 if cur_graph is None:
                     cur_graph = get_graph_by_name(None)
                 if cur_graph is not None:
+                    print(f"Current graph is: {chosen_graph}")
                     print("Enter the vertex to add: ", end="")
                     node = input()
                     cur_graph.add_node(node)
@@ -156,7 +162,8 @@ if __name__ == '__main__':
                 if cur_graph is None:
                     cur_graph = get_graph_by_name(None)
                 if cur_graph is not None:
-                    print("Enter the edge to add in format "'begin end'": ", end="")
+                    print(f"Current graph is: {chosen_graph}")
+                    print("Enter the edge to add: ", end="")
                     edge = input().split()
                     cur_graph.add_edge(edge)
 
@@ -164,6 +171,7 @@ if __name__ == '__main__':
                 if cur_graph is None:
                     cur_graph = get_graph_by_name(None)
                 if cur_graph is not None:
+                    print(f"Current graph is: {chosen_graph}")
                     print("Enter the vertex to delete: ", end="")
                     node = input()
                     cur_graph.delete_node(node)
@@ -172,7 +180,8 @@ if __name__ == '__main__':
                 if cur_graph is None:
                     cur_graph = get_graph_by_name(None)
                 if cur_graph is not None:
-                    print('Enter the edge to delete in format "begin end":', end="")
+                    print(f"Current graph is: {chosen_graph}")
+                    print('Enter the edge to delete":', end="")
                     edge = input().split()
                     cur_graph.delete_edge(edge)
 
@@ -180,6 +189,7 @@ if __name__ == '__main__':
                 if cur_graph is None:
                     cur_graph = get_graph_by_name(None)
                 if cur_graph is not None:
+                    print(f"Current graph is: {chosen_graph}")
                     print("Enter the name of file")
                     filename = input()
                     cur_graph.print_to_file(filename)
@@ -188,12 +198,14 @@ if __name__ == '__main__':
                 if cur_graph is None:
                     cur_graph = get_graph_by_name(None)
                 if cur_graph is not None:
+                    print(f"Current graph is: {chosen_graph}")
                     print(cur_graph.create_edge_list())
 
             elif command == "PRINT ADJACENCY LIST CONSOLE" or command == "11":
                 if cur_graph is None:
                     cur_graph = get_graph_by_name(None)
                 if cur_graph is not None:
+                    print(f"Current graph is: {chosen_graph}")
                     cur_graph.print_to_console()
 
             elif command == "PRINT LIST COMMANDS" or command == "14":
@@ -203,16 +215,50 @@ if __name__ == '__main__':
                 for gr in graphs.items():
                     print(f"Name: {gr[0]}\tAdjacency list: ", end="")
                     gr[1].print_to_console()
+                    print()
 
-            elif command == "IN DEG" or command == "100":
+            elif command == "IN DEGREE" or command == "100":
                 if cur_graph is None:
                     cur_graph = get_graph_by_name(None)
                 if cur_graph is not None:
+                    print(f"Current graph is: {chosen_graph}")
                     print("Enter the node")
                     node = input()
-                    ans = in_deg(cur_graph, node)
+                    ans = tasks.in_deg(cur_graph, node)
                     if ans != -1:
-                        print(f"in degree {ans[0]}\nneighbours {ans[1]}")
+                        if cur_graph.type == "!directed":
+                            print("This graph is not directed")
+                            print(f"degree {ans[0]}\nneighbours {' '.join(ans[1])}")
+                        else:
+                            print(f"income degree {ans[0]}\nincome neighbours {' '.join(ans[1])}")
+
+            elif command == "TASK Ib 18" or command == "101":
+                if cur_graph is None:
+                    cur_graph = get_graph_by_name(None)
+                if cur_graph is not None:
+                    print(f"Current graph is: {chosen_graph}")
+                    if cur_graph.type == "directed":
+                        print(f"Unable to create the new graph from {chosen_graph}")
+                    else:
+                        new_gr = tasks.new_graph(cur_graph)
+                        new_gr.print_to_console()
+                        print("Would you like to add new graph to list of graphs? Y/N")
+                        ans = input()
+                        if ans == "Y":
+                            print("Enter the name of the new-graph: ", end="")
+                            name = input()
+                            if name not in graphs.keys():
+                                graphs[name] = new_gr
+                            else:
+                                while name in graphs.keys():
+                                    print("ERROR. Try to enter another name or STOP to stop entering")
+                                    name = input()
+                                    if name == "STOP":
+                                        break
+                                else:
+                                    graphs[name] = new_gr
+                        elif ans != "N":
+                            print("Cannot recognise the answer")
 
         print("\nENTER THE COMMAND: ", end="")
         command = input()
