@@ -1,13 +1,17 @@
+from copy import deepcopy
+
+
 class Graph:
     adj_list = {}
     type = "!directed"
     weighted = False
     nodes_list = []
 
-    def __init__(self, type, weighted):
+    def __init__(self, *attributes):
         self.adj_list = {}
-        self.type = type
-        self.weighted = weighted
+        if len(attributes) > 0:
+            self.type = attributes[0]
+            self.weighted = True if attributes[1] == "weighted" else False
 
     def create_edge_list(self):
         edge_list = []
@@ -73,7 +77,10 @@ class Graph:
         return True
 
     def copy(self):
-        pass
+        cp_graph = Graph(self.type, "weighted" if self.weighted else "!weighted")
+        cp_graph.adj_list = deepcopy(self.adj_list)
+        cp_graph.nodes_list = self.nodes_list.copy()
+        return cp_graph
 
     def add_node(self, node):
         if node in self.nodes_list:
@@ -84,6 +91,9 @@ class Graph:
         return True
 
     def add_edge(self, edge):
+        if len(edge) < 2:
+            print(f"Unable to add the edge")
+            return False
         v, u = edge[0], edge[1]
         c = '1'
         if self.weighted:
@@ -92,6 +102,9 @@ class Graph:
             except KeyError:
                 print(f"Unable to add the edge. No weight entered")
                 return False
+        else:
+            if len(edge) == 3:
+                print("This graph is not weighted, so the weight of this edge not counted")
         try:
             if self.weighted:
                 nodes = [x[0] for x in self.adj_list[v]]
@@ -103,6 +116,9 @@ class Graph:
                     if ans == "Y":
                         self.adj_list[v][nodes.index(u)][1] = c
             else:
+                if v == u and self.type == "!directed":
+                    print(f"Unable to add the edge. No loop in not directed graph")
+                    return False
                 if [u, c] not in self.adj_list[v]:
                     self.adj_list[v].append([u, c])
                 else:
