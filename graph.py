@@ -96,10 +96,11 @@ class Graph:
             return False
         v, u = edge[0], edge[1]
         c = '1'
+        fl = False
         if self.weighted:
             try:
                 c = edge[2]
-            except KeyError:
+            except (KeyError, IndexError):
                 print(f"Unable to add the edge. No weight entered")
                 return False
         else:
@@ -107,6 +108,9 @@ class Graph:
                 print("This graph is not weighted, so the weight of this edge not counted")
         try:
             if self.weighted:
+                if v == u and self.type == "!directed":
+                    print(f"Unable to add the edge. No loop in not directed graph")
+                    return False
                 nodes = [x[0] for x in self.adj_list[v]]
                 if u in nodes:
                     print(f"Do you want to change the weight of edge {v} {u} "
@@ -114,13 +118,24 @@ class Graph:
                           f"Y/N")
                     ans = input()
                     if ans == "Y":
+                        fl = True
                         self.adj_list[v][nodes.index(u)][1] = c
+                else:
+                    if u in self.nodes_list and v in self.nodes_list:
+                        self.adj_list[v].append([u, c])
+                    else:
+                        print(f"Unable to add the edge. No such vertex")
+                        return False
             else:
                 if v == u and self.type == "!directed":
                     print(f"Unable to add the edge. No loop in not directed graph")
                     return False
                 if [u, c] not in self.adj_list[v]:
-                    self.adj_list[v].append([u, c])
+                    if u in self.nodes_list and v in self.nodes_list:
+                        self.adj_list[v].append([u, c])
+                    else:
+                        print(f"Unable to add the edge. No such vertex")
+                        return False
                 else:
                     print(f"Unable to add the edge. Same edge already exists")
                     return False
@@ -132,17 +147,24 @@ class Graph:
         if self.type != "directed":
             try:
                 if self.weighted:
+
                     nodes = [x[0] for x in self.adj_list[u]]
                     if v in nodes:
-                        print(f"Do you want to change the weight of edge {u} {v} "
-                              f"from {self.adj_list[u][nodes.index(v)][1]} to {c} "
-                              f"Y/N")
-                        ans = input()
-                        if ans == "Y":
+                        if fl:
                             self.adj_list[u][nodes.index(v)][1] = c
+                    else:
+                        if u in self.nodes_list and v in self.nodes_list:
+                            self.adj_list[u].append([v, c])
+                        else:
+                            print(f"Unable to add the edge. No such vertex")
+                            return False
                 else:
                     if [v, c] not in self.adj_list[u]:
-                        self.adj_list[u].append([v, c])
+                        if u in self.nodes_list and v in self.nodes_list:
+                            self.adj_list[u].append([v, c])
+                        else:
+                            print(f"Unable to add the edge. No such vertex")
+                            return False
                     else:
                         print(f"Unable to add the edge. Same edge already exists")
                         return False
@@ -210,4 +232,3 @@ class Graph:
                 nodes = [x[0] for x in item[1]]
                 line = " ".join(nodes)
                 print(f"{item[0]}: {line}")
-
