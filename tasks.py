@@ -1,4 +1,4 @@
-import graph
+from graph import Graph
 
 
 def in_deg(graph, node):
@@ -26,5 +26,17 @@ def new_graph(graph):
     return gr
 
 
-def dfs(node):
+def dfs(node, color):
     pass
+
+
+def acycle(graph):
+    gr = graph.copy()
+    color = [0 for _ in range(len(gr.nodes_list))]
+    for node in gr.nodes_list():
+        pass
+
+
+graph = Graph()
+graph.create_from_file("a.txt")
+acycle(graph)
