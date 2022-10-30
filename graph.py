@@ -13,12 +13,20 @@ class Graph:
             self.type = attributes[0]
             self.weighted = True if attributes[1] == "weighted" else False
 
-    def create_edge_list(self):
+    def create_edge_list(self, dublicate):
         edge_list = []
 
-        for node in self.adj_list.keys():
-            for adj in self.adj_list[node]:
-                edge_list.append((node, adj))
+        if not dublicate:
+            edges = []
+            for node in self.adj_list.keys():
+                for adj in self.adj_list[node]:
+                    if [node, adj[0]] not in edges:
+                        edges.append([adj[0], node])
+                        edge_list.append([node, adj[0], adj[1]])
+        else:
+            for node in self.adj_list.keys():
+                for adj in self.adj_list[node]:
+                    edge_list.append([node, adj[0], adj[1]])
 
         return edge_list
 
