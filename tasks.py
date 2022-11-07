@@ -49,6 +49,7 @@ def acycle(graph):
         print("Graph is directed")
         return
     global color, cycle
+    cycle = False
     gr = graph.copy()
     color = [0 for _ in range(len(gr.nodes_list))]
     for node in gr.nodes_list:
